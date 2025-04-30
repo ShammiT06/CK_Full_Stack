@@ -5,7 +5,7 @@ import tick from "../assets/Vector.png";
 import scanner from "../assets/scanner.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Html5Qrcode } from "html5-qrcode";
-import { CityContext, ImageContext, MobileContext, Refcontext, RegionContext, TextContext } from "../App";
+import { CityContext, ImageContext, MobileContext, Refcontext, RegionContext} from "../App";
 import axios from 'axios'
 
 function Payment() {
@@ -30,8 +30,6 @@ function Payment() {
     const {city}=useContext(CityContext)
     const {region}=useContext(RegionContext)
     const {mobile, setmobile}= useContext(MobileContext)
-    const {recognized}=useContext(TextContext)
-
     const [imageText,setImagetext]=useState("")
 
 
@@ -169,7 +167,7 @@ function Payment() {
        
             <div className="p-5">
                 <img src={image} alt="Please Capture Again" className="w-80" />
-                <input type="text" placeholder="Enter Your Code" className="mt-5 border border-black p-2 rounded-md w-80" />
+                <input type="text" placeholder="Enter Your Code" className="mt-5 border border-black p-2 rounded-md w-80" value={imageText} onChange={(e)=>{setImagetext(e.target.value)}} />
 
             </div>
 

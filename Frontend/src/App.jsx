@@ -25,14 +25,13 @@ const Refcontext = createContext()
 const CityContext = createContext()
 const RegionContext = createContext()
 const MobileContext = createContext()
-const TextContext = createContext()
+
 function App() {
   const [image, setimage] = useState();
   const [spin, setspin] = useState()
   const [city, setcity] = useState()
   const [region, setregion] = useState()
   const [mobile, setmobile] = useState()
-  const [recognized, setRecognized] = useState()
 
   return (
     <>
@@ -41,8 +40,6 @@ function App() {
           <CityContext.Provider value={{ city, setcity }}>
             <RegionContext.Provider value={{ region, setregion }}>
               <MobileContext.Provider value={{ mobile, setmobile }}>
-                <TextContext.Provider value={{ recognized, setRecognized }}>
-
                   <BrowserRouter>
                     <Routes>
                       {/* Vendor Page Routes */}
@@ -66,8 +63,6 @@ function App() {
                       <Route path="/supportRef" element={<SupportRef />} />
                     </Routes>
                   </BrowserRouter>
-                </TextContext.Provider>
-
               </MobileContext.Provider>
             </RegionContext.Provider>
           </CityContext.Provider>
@@ -83,4 +78,3 @@ export { Refcontext }
 export { CityContext }
 export { RegionContext }
 export { MobileContext }
-export {TextContext}
