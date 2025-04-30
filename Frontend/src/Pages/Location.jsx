@@ -3,84 +3,68 @@ import { useNavigate } from "react-router-dom";
 import Reusablespinz from "../Components/Reusablespinz";
 import "../Css/location.css";
 import { CityContext, ImageContext, RegionContext } from "../App";
-import axios from "axios";
 
 function Location() {
     const navigate = useNavigate();
     const { image, setimage } = useContext(ImageContext);
-    const [loading, setLoading] = useState(false);
-    const [loadingMessage, setLoadingMessage] = useState("");
     const { setcity } = useContext(CityContext);
     const { setregion } = useContext(RegionContext);
+
+    const [loading, setLoading] = useState(false);
+    const [loadingMessage, setLoadingMessage] = useState("");
     const fileInputRef = useRef(null);
 
-    const checkPermissionAndGetLocation = async () => {
-        try {
-            const permission = await navigator.permissions.query({ name: "geolocation" });
-
-            if (permission.state === "granted" || permission.state === "prompt") {
-                getLocation();
-            } else {
-                console.log("Location access denied. Please enable location manually.");
-            }
-        } catch (err) {
-            console.log("Error checking location permission:", err);
+    const handleAllowClick = async () => {
+        // 1. Immediately trigger camera input
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
         }
-    };
 
-    const getLocation = () => {
+        // 2. Meanwhile fetch location
         setLoading(true);
         setLoadingMessage("Getting your location...");
 
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude } = position.coords;
+        try {
+            const permission = await navigator.permissions.query({ name: "geolocation" });
+            if (permission.state === "granted" || permission.state === "prompt") {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude } = position.coords;
+                        try {
+                            const res = await fetch(
+                                `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+                            );
+                            const data = await res.json();
 
-                try {
-                    const res = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
-                    );
-                    const data = await res.json();
+                            const cityName = data.address.city ||
+                                data.address.town ||
+                                data.address.village ||
+                                data.address.locality ||
+                                "Unknown City";
+                            const state = data.address.state || "Unknown State";
 
-                    const cityName = data.address.city ||
-                        data.address.town ||
-                        data.address.village ||
-                        data.address.locality ||
-                        "Unknown City";
-                    const state = data.address.state || "Unknown State";
-
-                    setcity(cityName);
-                    setregion(state);
-                    console.log(cityName);
-                    console.log(state);
-
-                    setLoadingMessage("Opening camera...");
-
-                    // Trigger the hidden file input
-                    if (fileInputRef.current) {
-                        fileInputRef.current.click();
+                            setcity(cityName);
+                            setregion(state);
+                            console.log("City:", cityName, "State:", state);
+                        } catch (err) {
+                            console.error("Reverse geocoding failed:", err);
+                        }
+                    },
+                    (error) => {
+                        console.error("Geolocation error:", error);
                     }
-                } catch (err) {
-                    console.error("Failed to fetch city:", err);
-                    setLoadingMessage("Failed to fetch city name.");
-                    setLoading(false);
-                }
-            },
-            (error) => {
-                console.log("An error occurred:", error);
-                setLoading(false);
-                setLoadingMessage("Unable to get location.");
+                );
             }
-        );
+        } catch (err) {
+            console.error("Permission error:", err);
+        }
     };
 
     const handleFileChange = async (event) => {
         const file = event.target.files[0];
-        if (!file) {
-            setLoading(false);
-            return;
-        }
+        if (!file) return;
 
+        setLoading(true);
         setLoadingMessage("Uploading image...");
 
         const formdata = new FormData();
@@ -103,7 +87,7 @@ function Location() {
                 navigate("/pay");
             }, 1000);
         } catch (error) {
-            console.error("Cloudinary upload failed:", error);
+            console.error("Upload failed:", error);
             setLoading(false);
         }
     };
@@ -145,21 +129,18 @@ function Location() {
                         <div className="flex flex-col">
                             <button
                                 className="w-[270px] h-[44px] border border-[#787878] font-inter text-[#5A91F7]"
-                                style={{ padding: "11px 8px" }}
-                                onClick={checkPermissionAndGetLocation}
+                                onClick={handleAllowClick}
                             >
                                 Allow
                             </button>
                             <button
                                 className="w-[270px] h-[44px] border border-[#787878] text-[#5A91F7]"
-                                style={{ padding: "11px 8px" }}
-                                onClick={checkPermissionAndGetLocation}
+                                onClick={handleAllowClick}
                             >
                                 Allow While Using App
                             </button>
                             <button
                                 className="w-[270px] h-[44px] border border-[#787878] text-[#5A91F7] rounded-bl-xl rounded-br-xl"
-                                style={{ padding: "11px 8px" }}
                                 onClick={() => navigate("/")}
                             >
                                 Don’t Allow
@@ -169,7 +150,7 @@ function Location() {
                 </div>
             </div>
 
-            {/* Hidden input for camera capture */}
+            {/* Camera trigger input */}
             <input
                 type="file"
                 accept="image/*"
