@@ -24,8 +24,8 @@ const twilioNumber = "+19704142856"
 let link = "https://spinz-full-stack.vercel.app/tracking"
 
 const con = new Client({
-  host: "13.126.249.32",
-  user: "dbadmin",
+  host: "localhost",
+  user: "postgres",
   port: 5432,
   password: process.env.DATAPASS,
   database: process.env.DATABASE,
@@ -50,9 +50,10 @@ app.post("/user", (req, res) => {
   let referenceid = req.body.spin;
   let city = req.body.city;
   let region = req.body.region;
+  let code=req.body.imageText
 
   // Insert data into users table
-  const insert_query = "INSERT INTO vendors(name, mobile, referenceid, upiid, city, region, image) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id";
+  const insert_query = "INSERT INTO users(name, mobile, referenceid, upiid, city, region, image) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id";
   
   con.query(insert_query, [name, mobile, referenceid, upiid, city, region, image], (err, result) => {
     if (err) {
@@ -84,7 +85,7 @@ app.post("/user", (req, res) => {
 //Pending data 
 
 app.get("/fetchData", (req, res) => {
-  const fetchQuery = "SELECT * from vendors where status = 'Pending' ";
+  const fetchQuery = "SELECT * from users where status = 'Pending' ";
   con.query(fetchQuery, (err, result) => {
     if (err) {
       console.error("Error fetching users:", err);
@@ -98,7 +99,7 @@ app.get("/fetchData", (req, res) => {
 //pay appove
 
 app.get("/payment", (req, res) => {
-  const payment = "SELECT * from vendors where status = 'Approved'";
+  const payment = "SELECT * from users where status = 'Approved'";
   con.query(payment, (err, result) => {
     if (err) {
       console.log("Error in Fecting Data")
@@ -113,7 +114,7 @@ app.get("/payment", (req, res) => {
 //Total Number of users
 
 app.get("/total", (req, res) => {
-  const number = "SELECT COUNT(*)  FROM vendors";
+  const number = "SELECT COUNT(*)  FROM users";
 
   con.query(number, (err, result) => {
     if (err) {
@@ -127,7 +128,7 @@ app.get("/total", (req, res) => {
 //Dashboard API
 
 app.get("/bord", (req, res) => {
-  const dash = "select * from vendors"
+  const dash = "select * from users"
   con.query(dash, (err, result) => {
     if (err) {
       res.send("Error")
@@ -142,7 +143,7 @@ app.get("/bord", (req, res) => {
 //Pending Data API
 
 app.get("/fetchapprove", (req, res) => {
-  const fetchQuery = "SELECT * FROM vendors where status !='Pending'"
+  const fetchQuery = "SELECT * FROM users where status !='Pending'"
   con.query(fetchQuery, (err, result) => {
     if (err) {
       res.send("Error in Sending data")
@@ -154,7 +155,7 @@ app.get("/fetchapprove", (req, res) => {
 //Pending Api
 
 app.get("/pending", (req, res) => {
-  const pendingreq = "SELECT count(*) FROM vendors WHERE status = 'Pending'"
+  const pendingreq = "SELECT count(*) FROM users WHERE status = 'Pending'"
   con.query(pendingreq, (err, snt) => {
     if (err) {
       res.send("Error")
@@ -172,7 +173,7 @@ app.put("/approveRequest", (req, res) => {
  
 
   const query = `
-    UPDATE "vendors"
+    UPDATE "users"
     SET status = 'Approved'
     WHERE id = $1
   `;
@@ -201,7 +202,7 @@ app.put("/decline", (req, res) => {
   console.log(id)
 
   const query = `
-  UPDATE "vendors"
+  UPDATE "users"
   SET status ='Declined'
   WHERE id=$1`;
 
@@ -218,7 +219,7 @@ app.put("/decline", (req, res) => {
 //Approved Request
 
 app.get("/approved", (req, res) => {
-  const approve = "SELECT count(*)from vendors WHERE status !='Pending'"
+  const approve = "SELECT count(*)from users WHERE status !='Pending'"
 
   con.query(approve, (err, response) => {
     if (err) {
@@ -256,7 +257,7 @@ app.post("/con", async (req, res) => {
 app.post("/download", async (req, res) => {
   try {
     // Fetching ALL data from users table
-    const query = `select * from vendors`;
+    const query = `select * from users`;
     const result = await con.query(query);
 
     const data = result.rows;
@@ -354,23 +355,19 @@ app.post("/mail", function (req, res) {
   )
 })
 
-
-app.get("/tracking", function(req, res) {
-  const newid = req.query.refid;
+app.post("/tracking", (req, res) => {
+  const { refid } = req.body;
+  console.log(refid);
 
   const select_query = `SELECT * FROM tracking WHERE referenceid = $1`;
 
-  con.query(select_query, [newid], (err, result) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("Error");
+  con.query(select_query, [refid], (err, result) => {
+    if (err) return res.status(500).send("Error");
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
     } else {
-      if (result.rows.length > 0) {
-        res.status(200).json(result.rows[0]);
-        console.log(result.rows[0])  // Send as JSON
-      } else {
-        res.status(404).send("No record found");
-      }
+      res.status(404).send("No record found");
     }
   });
 });

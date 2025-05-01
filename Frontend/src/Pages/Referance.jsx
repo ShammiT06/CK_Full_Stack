@@ -13,7 +13,7 @@ function Reference() {
 
 
   function confirmation() {
-    axios.post("https://localhost:5000/con", { spin, mobile }).then(() => {
+    axios.post("http://localhost:5000/con", { spin, mobile }).then(() => {
       console.log("Successfull")
       setTimeout(() => {
         setIsDone(true)

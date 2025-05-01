@@ -45,7 +45,6 @@ function Location() {
 
                             setcity(cityName);
                             setregion(state);
-                            console.log("City:", cityName, "State:", state);
                         } catch (err) {
                             console.error("Reverse geocoding failed:", err);
                         }

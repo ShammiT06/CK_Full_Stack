@@ -31,6 +31,8 @@ function Payment() {
     const {region}=useContext(RegionContext)
     const {mobile, setmobile}= useContext(MobileContext)
     const [imageText,setImagetext]=useState("")
+    const [shop,setShop]=useState("")
+    const [pincode,setPincode]=useState("")
 
 
 
@@ -130,7 +132,7 @@ function Payment() {
     }
 
     const dataupload = () => {
-        axios.post("http://localhost:5000/user", { user, mobile, upiId, image, spin,city,region}).then(() => {
+        axios.post("http://localhost:5000/user", { user, mobile, upiId, image, spin,city,region,imageText}).then(() => {
             console.log("Data Sent Successfully")
 
         }).catch(() => {
@@ -181,6 +183,20 @@ function Payment() {
                         value={user}
                         onChange={(e) => { setuser(e.target.value) }}
                     />
+                    <div className="mt-3">
+                        <label className="font-inter font-medium text-1xl">Shop Name</label>
+                        <div>
+                            <input type="text" value={shop} onChange={(e)=>{setShop(e.target.value)}} placeholder="Enter shop name" className="w-full rounded-lg h-[52px] p-2 font-inter text-sm mt-2 border focus:outline-none"/>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Pincode</label>
+                        <div>
+                            <input type="number" placeholder="Enter Pincode" className="w-full rounded-lg h-[52px] p-2 font-inter text-sm mt-2 border focus:outline-none
+                            
+                            " />
+                        </div>
+                    </div>
 
                     <div className="mt-8">
                         <label className="font-inter text-1xl font-medium">
