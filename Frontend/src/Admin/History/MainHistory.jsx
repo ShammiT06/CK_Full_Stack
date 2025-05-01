@@ -48,9 +48,9 @@ const History = () => {
   }, []);
 
   return (
-    <div className="overflow-x-auto mt-4 p-8 shadow rounded-lg bg-white">
+    <div className="overflow-x-auto mt-4 p-8  rounded-lg bg-white">
       <table className="table-auto w-full text-sm">
-        <thead className="bg-gray-100">
+        <thead className="bg-gray-100 shadow">
           <tr>
             <th className="px-4 py-4 text-center text-xl font-bold">S.No</th>
             <th className="px-4 py-4 text-center text-xl font-bold">
@@ -65,12 +65,24 @@ const History = () => {
             <th className="px-4 py-4 text-center text-xl font-bold">
               UPI Credentials
             </th>
+            <th className="px-4 py-4 text-center text-xl font-bold">
+              Shop Name
+            </th>
             <th className="px-4 py-4 text-center text-xl font-bold">Status</th>
             <th className="px-4 py-4 text-center text-xl font-bold">
               City
             </th>
             <th className="px-4 py-4 text-center text-xl font-bold">
               State
+            </th>
+            <th className="px-4 py-4 text-center text-xl font-bold">
+              Pincode
+            </th>
+            <th className="px-4 py-4 text-center text-xl font-bold">
+              Lattitude
+            </th>
+            <th className="px-4 py-4 text-center text-xl font-bold">
+              Longitude
             </th>
           </tr>
         </thead>
@@ -80,13 +92,14 @@ const History = () => {
               key={item.id}
               className="border-t cursor-pointer hover:bg-gray-100 text-center even:bg-[#d9d9d944]"
               onClick={() => navigate(`/pending/${item.id}`)}
-              
+
             >
               <td className="px-8 py-2 border-r">{item.id}</td>
               <td className="px-4 py-2 border-r">{item.referenceid}</td>
               <td className="px-4 py-2 border-r">{item.name}</td>
               <td className="px-4 py-2 border-r">{item.mobile}</td>
               <td className="px-4 py-2 border-r">{item.upiid}</td>
+              <td className="px-4 py-2 border-r">{item.shopname}</td>
               <td className="px-4 py-2 border-r">
                 <span className="flex items-center justify-start ml-5 gap-1">
                   <span
@@ -97,23 +110,6 @@ const History = () => {
                 </span>
               </td>
               <td className="px-4 py-2 border-r">
-                {/* <span className="flex items-center justify-center gap-1">
-                  {item.payment === "Done" ? (
-                    <>
-                      <span className="text-green-600">
-                        <img src={done} alt="" />
-                      </span>{" "}
-                      Done
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-red-600">
-                        <img src={fail} alt="" />
-                      </span>{" "}
-                      Failed
-                    </>
-                  )}
-                </span> */}
                 {item.city}
               </td>
               <td className="px-4 py-2 border-r">
@@ -121,6 +117,9 @@ const History = () => {
                   {item.region}
                 </div>
               </td>
+              <td className="px-4 py-2 border-r">{item.pincode}</td>
+              <td className="px-4 py-2 border-r">{item.lattitude}</td>
+              <td className="px-4 py-2 border-r">{item.logitude}</td>
             </tr>
           ))}
         </tbody>

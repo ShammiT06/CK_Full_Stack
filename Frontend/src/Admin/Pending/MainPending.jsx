@@ -55,7 +55,11 @@ const Pending = () => {
                 <th className="px-4 py-4 text-center text-xl font-bold">Full Name</th>
                 <th className="px-4 py-4 text-center text-xl font-bold">Mobile Number</th>
                 <th className="px-4 py-4 text-center text-xl font-bold">UPI Credientials</th>
+                <th className="px-4 py-4 text-center text-xl font-bold">Shop Name</th>
                 <th className="px-4 py-4 text-center text-xl font-bold">City</th>
+                <th className="px-4 py-4 text-center text-xl font-bold">Pincode</th>
+                <th className="px-4 py-4 text-center text-xl font-bold">Lattitude</th>
+                <th className="px-4 py-4 text-center text-xl font-bold">Longitude</th>
                 <th className="px-4 py-4 text-center text-xl font-bold">Action</th>
               </tr>
             </thead>
@@ -72,7 +76,11 @@ const Pending = () => {
                   <td className="px-4 py-2 border-r">{item.name}</td>
                   <td className="px-4 py-2 border-r">{item.mobile}</td>
                   <td className="px-4 py-2 border-r">{item.upiid}</td>
+                  <td className="px-4 py-2 border-r">{item.shopname}</td>
                   <td className="px-4 py-2 border-r">{item.city}</td>
+                  <td className="px-4 py-2 border-r">{item.pincode}</td>
+                  <td className="px-4 py-2 border-r">{item.lattitude}</td>
+                  <td className="px-4 py-2 border-r">{item.longitude}</td>
                   <td className="px-4 py-2 flex justify-center gap-2">
                     <button className="bg-green-500 hover:bg-green-600 p-2 rounded text-white">
                       ✅

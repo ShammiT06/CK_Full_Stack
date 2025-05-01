@@ -29,8 +29,6 @@ const con = new Client({
   port: 5432,
   password: process.env.DATAPASS,
   database: process.env.DATABASE,
-  // connectionString: process.env.DATABASE_URL,
-  // ssl: { rejectUnauthorized: false } // required for Railway
 
 })
 
@@ -50,12 +48,18 @@ app.post("/user", (req, res) => {
   let referenceid = req.body.spin;
   let city = req.body.city;
   let region = req.body.region;
-  let code=req.body.imageText
+  let shop=req.body.shop
+  let code=req.body.pincode
+  let lattitude=req.body.lattitude
+  let longitude=req.body.longitude
+
+  console.log(lattitude)
+  console.log(longitude)
 
   // Insert data into users table
-  const insert_query = "INSERT INTO users(name, mobile, referenceid, upiid, city, region, image) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id";
+  const insert_query = "INSERT INTO users(name, mobile, referenceid, upiid, city, region, image,shopname,pincode,lattitude,longitude) VALUES($1, $2, $3, $4, $5, $6, $7,$8,$9,$10,$11) RETURNING id";
   
-  con.query(insert_query, [name, mobile, referenceid, upiid, city, region, image], (err, result) => {
+  con.query(insert_query, [name, mobile, referenceid, upiid, city, region, image,shop,code,lattitude,longitude], (err, result) => {
     if (err) {
       console.log("Error:", err);
       return res.status(500).send("Error in Sending Data to Users Table");

@@ -2,13 +2,15 @@ import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Reusablespinz from "../Components/Reusablespinz";
 import "../Css/location.css";
-import { CityContext, ImageContext, RegionContext } from "../App";
+import { CityContext, ImageContext, LattitudeContext, LongitudeContext, RegionContext } from "../App";
 
 function Location() {
     const navigate = useNavigate();
     const { image, setimage } = useContext(ImageContext);
     const { setcity } = useContext(CityContext);
     const { setregion } = useContext(RegionContext);
+    const {setLattitude}=useContext(LattitudeContext)
+    const {setLongitude}=useContext(LongitudeContext)
 
     const [loading, setLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("");
@@ -45,6 +47,12 @@ function Location() {
 
                             setcity(cityName);
                             setregion(state);
+                            setLattitude(latitude)
+                            setLongitude(longitude)
+                            
+                            console.log(latitude)
+                            
+                        
                         } catch (err) {
                             console.error("Reverse geocoding failed:", err);
                         }
