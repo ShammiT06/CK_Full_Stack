@@ -51,7 +51,7 @@ const Tabs = () => {
       }
       else
       {
-       setAdmin(false)
+       navigate("/login")
       }
 
     })

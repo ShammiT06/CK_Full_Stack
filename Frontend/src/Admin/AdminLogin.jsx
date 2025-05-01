@@ -21,7 +21,7 @@ const AdminLoginPage = () => {
         // setDisplayName(user.email);
         navigate("/admin");
       } else {
-        console.log("No user is logged in");
+        navigate("/login")
       }
     }
     );
@@ -43,24 +43,24 @@ const AdminLoginPage = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Left Section - Image & Logo */}
-      <div className="hidden md:flex md:w-1/2 text-white justify-center items-center rounded-3xl">
+      <div className="hidden md:flex md:w-1/2 text-white justify-around items-center rounded-3xl">
         <div className="text-center">
           <img
             src={logo}
             alt="Spinz Products"
-            className="rounded-xl max-w-full h-auto"
+            className="rounded-xl my-2 w-[90%] h-auto"
           />
         </div>
       </div>
 
       {/* Right Section - Login Form */}
-      <div className="w-full md:w-1/2 flex justify-center items-center p-6">
+      <div className="w-full md:w-1/2 flex justify-between items-center p-6">
         <div className="max-w-md w-full space-y-6">
           <div>
             <div className="flex justify-center items-center">                
                 <img src={spinzPink} alt="no image" className="w-[85px] h-[55px]" />
             </div>
-            <h1 className="font-marienda text-2xl font-normal mt-5 text-center">Welcome Back Ajay</h1>
+            <h1 className="font-marienda text-2xl font-normal mt-5 text-center">Welcome Back </h1>
             <p className="font-inter text-2xl font-medium text-black text-opacity-50  mt-2">Login</p>
           </div>
           <form className="space-y-4">
