@@ -201,6 +201,7 @@ app.put("/approveRequest", (req, res) => {
   })
 });
 
+// Decline Api
 app.put("/decline", (req, res) => {
   const id = req.body.id;
   console.log(id)
@@ -210,14 +211,22 @@ app.put("/decline", (req, res) => {
   SET status ='Declined'
   WHERE id=$1`;
 
+  const decline_query = ` UPDATE "tracking" SET status='Declined' WHERE users_id=$1`
+
   con.query(query, [id], (err, result) => {
     if (err) {
       console.error("SQL Error:", err);
       return res.status(500).json({ error: "Update failed" });
     }
-
-    res.json({ message: "User approved successfully" });
   });
+
+  con.query(decline_query,[id],(err,result)=>{
+    if(err)
+    {
+      console.log("Error in Sending")
+    }
+    console.log("Set to Declined")
+  })
 })
 
 //Approved Request
@@ -359,10 +368,8 @@ app.post("/mail", function (req, res) {
   )
 })
 
-app.post("/tracking", (req, res) => {
-  const { refid } = req.body;
-  console.log(refid);
-
+app.get("/tracking", (req, res) => {
+  let  refid  = req.query.referenceid;
   const select_query = `SELECT * FROM tracking WHERE referenceid = $1`;
 
   con.query(select_query, [refid], (err, result) => {
@@ -370,11 +377,54 @@ app.post("/tracking", (req, res) => {
 
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
+      console.log(result.rows[0].status)
     } else {
       res.status(404).send("No record found");
     }
   });
 });
+
+
+// Time Validation for Users
+
+app.get("/date",(req,res)=>{
+  let newvalue = req.query.number
+  console.log(newvalue)
+
+  const data_vali = `SELECT registered_at from users where mobile =$1`
+
+  con.query(data_vali,[newvalue],(err,result)=>{
+    if(err)
+    {
+      return res.send("Error Occured")
+    }
+    else
+    {
+      res.send(result.rows[0])
+    }
+  })
+})
+
+
+//autofill details in userpage
+
+app.get("/user_fill",(req,res)=>{
+  let mobile = req.query.mobilenumber
+  const auto_querry= `SELECT * FROM users where mobile=$1`
+
+  con.query(auto_querry,[mobile],(err,result)=>{
+    if (err)
+    {
+      return res.send("Error Occured")
+
+    }
+    else
+    {
+      res.send(result.rows[0])
+    }
+      
+  })
+},[])
 
 
 

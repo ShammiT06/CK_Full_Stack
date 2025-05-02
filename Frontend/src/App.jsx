@@ -17,7 +17,7 @@ import SMSForm from "../src/SMS/SMSForm.jsx";
 import SupportRef from "../src/SMS/SupportRef.jsx";
 import Dashboard from "./Admin/Dashboard.jsx";
 import Pending from "./Admin/Pending/MainPending.jsx";
-import Referenceid from "./SMS/Refid.jsx";
+
 
 
 const ImageContext = createContext();
@@ -65,7 +65,6 @@ function App() {
                       <Route path="/pend" element={<Pending />}>~</Route>
                       {/* SMS Routes */}
                       <Route path="/tracking" element={<Tracking />} />
-                      <Route path="/refid" element={<Referenceid />}></Route>
                       <Route path="/smsform" element={<SMSForm />} />
                       <Route path="/supportRef" element={<SupportRef />} />
                     </Routes>
