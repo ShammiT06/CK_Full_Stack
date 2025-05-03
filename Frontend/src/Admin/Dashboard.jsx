@@ -48,7 +48,7 @@ const Dashboard = () => {
 
 
     return (<>
-    <div className='relative'> 
+    {/* <div className='relative'> 
         <div className='p-4 bg-pink-500 flex items-center justify-between'>
         <div>
         <img src={logo} alt="" />
@@ -57,7 +57,8 @@ const Dashboard = () => {
             <button className='p-3 border rounded'><Link to="/admin">Admin</Link></button>
         </div>
         </div>
-    </div>
+    </div> */}
+    <Header/>
     
         <div className="p-6 bg-gray-100 min-h-screen">
             <div className='mb-5'>

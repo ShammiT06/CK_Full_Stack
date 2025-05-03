@@ -8,16 +8,15 @@ export default function AdminPayment() {
   const [userData, setUserData] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
 
-  useEffect(() => {
-    axios
-      .get("http://localhsot:5000/payment")
-      .then((response) => {
-        setUserData(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-      });
-  }, []);
+  
+
+  useEffect(()=>{
+    axios.get("http://localhost:5000/pay").then((data)=>{
+      setUserData(data.data)
+    }).catch(()=>{
+      console.log("Error Occured")
+    })
+  })
 
   const handleCheckboxChange = (id) => {
     if (selectedUsers.includes(id)) {
@@ -32,28 +31,25 @@ export default function AdminPayment() {
       alert("Please select at least one user to pay.");
       return;
     }
-
+  
     try {
-      const amount = selectedUsers.length * 1; 
-      const { data } = await axios.post("http:localhost:5000/create_order", {
-        amount: amount, 
+      const amount = selectedUsers.length * 1;
+  
+      const { data } = await axios.post("http://localhost:5000/create_order", {
+        amount: amount,
       });
-
-    
+  
       const options = {
-        key: "CLaH569cQ4Pb9PxHU6jHhPPA", 
-        amount: amount * 100, 
+        key: "rzp_live_gN9cIxPm0o55sE", 
+        amount: amount * 100,
         currency: "INR",
         name: "Thirdvizion",
         description: "Payout for Cashback",
-        order_id: data.id, 
+        order_id: data.id, // from backend
         handler: async function (response) {
-          
           console.log("Payment Success", response);
-
-          
           try {
-            await axios.post("http:localhost:5000/verify-payment", {
+            await axios.post("http://localhost:5000/verify-payment", {
               paymentData: response,
             });
             alert("Payment Successful and Verified!");
@@ -71,7 +67,7 @@ export default function AdminPayment() {
           color: "#3399cc",
         },
       };
-
+  
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
@@ -79,7 +75,7 @@ export default function AdminPayment() {
       alert("Something went wrong during payment initiation.");
     }
   };
-
+  
   return (
     <>
       <Header />

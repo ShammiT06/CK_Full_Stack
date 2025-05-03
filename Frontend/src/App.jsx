@@ -17,6 +17,7 @@ import SMSForm from "../src/SMS/SMSForm.jsx";
 import SupportRef from "../src/SMS/SupportRef.jsx";
 import Dashboard from "./Admin/Dashboard.jsx";
 import Pending from "./Admin/Pending/MainPending.jsx";
+import InnerHistory from "./Admin/History/InnerHistory.jsx";
 
 
 
@@ -63,6 +64,7 @@ function App() {
                       <Route path="/payout" element={<AdminPayment />} />
                       <Route path="/dash" element={<Dashboard />}></Route>
                       <Route path="/pend" element={<Pending />}>~</Route>
+                      <Route path="/history/:id" element={<InnerHistory/>}></Route>
                       {/* SMS Routes */}
                       <Route path="/tracking" element={<Tracking />} />
                       <Route path="/smsform" element={<SMSForm />} />

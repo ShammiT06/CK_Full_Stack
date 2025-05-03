@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import spinzWhite from "../assets/SpinzWhite.png";
 import { signOut } from "firebase/auth";
 import { auth } from "../config";
@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const navigate = useNavigate();
+
+  const [route, setRoute] = useState("");
+
 
   const handleLogout = () => {
     signOut(auth)
@@ -21,8 +24,9 @@ const Header = () => {
 
   const handleChange = (e) => {
     const value = e.target.value;
+    setRoute(value);
     if (value) {
-      navigate(value); // 👈 This triggers the route
+      navigate(value);
     }
   };
 
@@ -45,16 +49,20 @@ const Header = () => {
 
         <div className="relative w-fit text-black cursor-pointer select-none group">
           <select
+          value={route}
             onChange={handleChange}
-            className="bg-transparent border px-5 py-3 rounded-md text-sm font-inter text-white min-w-[140px] focus:outline-none appearance-none pr-6"
+            className="bg-transparent border px-5 py-3 rounded-md text-sm font-inter text-white min-w-[140px] focus:outline-none appearance-none pr-6 "
           >
-            <option value="/dash" className="bg-[#925AC6] bg-opacity-25">
+             <option value="" disabled hidden>
+              Profile
+  </option>
+            <option value="/dash" className="bg-[#925AC6] bg-opacity-25 text-black m-10">
               Dashboard
             </option>
-            <option value="/admin" className="bg-[#925AC6] bg-opacity-25">
+            <option value="/admin" className="bg-[#925AC6] bg-opacity-25 text-black m-10">
               Admin
             </option>
-            <option value="/payout" className="bg-[#925AC6] bg-opacity-25">
+            <option value="/payout" className="bg-[#925AC6] bg-opacity-25 text-black m-10">
               Payment
             </option>
           </select>

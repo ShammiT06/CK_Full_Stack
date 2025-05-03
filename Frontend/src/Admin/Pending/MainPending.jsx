@@ -11,15 +11,15 @@ const Pending = () => {
   const [userData, setUserData] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  
 
   // Filter based on search
   const filteredData = userData.filter((item) => {
-    const term = searchTerm.toLowerCase();
+    // const term = searchTerm.toLowerCase();
     return (
-      item.name.toLowerCase().includes(term) ||
-      item.reference.toLowerCase().includes(term) ||
-      item.mobile.toLowerCase().includes(term) ||
+      item.name.toLowerCase() ||
+      item.reference.toLowerCase() ||
+      item.mobile.toLowerCase() ||
       (item.upi && item.upi.toLowerCase().includes(term))
     );
   });

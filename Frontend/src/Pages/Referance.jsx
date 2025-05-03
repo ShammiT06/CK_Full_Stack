@@ -25,8 +25,9 @@ function Reference() {
 
   return (
     <div className="p-5 mt-48">
+      <div className="flex justify-center items-center">
       <img src={logo} alt="Spinz Logo" />
-
+      </div>
       {!isDone ? (
         <>
           <div className="border w-full h-auto mt-10 border-[#A246BB] rounded-lg p-3">

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import done from "/src/assets/Done.png";
-import fail from "/src/assets/Fail.png";
 import { useNavigate } from "react-router-dom";
 
-
 const ITEMS_PER_PAGE = 8;
+
 const History = () => {
 
   const navigate = useNavigate();
@@ -13,33 +11,29 @@ const History = () => {
   const [userData, setUserData] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Filter based on search
   const filteredData = userData.filter((item) => {
-    const term = searchTerm.toLowerCase();
     return (
-      item.name.toLowerCase().includes(term) ||
-      item.reference.toLowerCase().includes(term) ||
-      item.mobile.toLowerCase().includes(term) ||
-      (item.upi && item.upi.toLowerCase().includes(term)) ||
-      (item.status && item.status.toLowerCase().includes(term)) ||
-      (item.payment && item.payment.toLowerCase().includes(term))
+      item.name.toLowerCase() ||
+      item.reference.toLowerCase() ||
+      item.mobile.toLowerCase() ||
+      (item.upi && item.upi.toLowerCase()) ||
+      (item.status && item.status.toLowerCase()) ||
+      (item.payment && item.payment.toLowerCase())
     );
   });
 
   const reversedData = filteredData.slice().reverse();
   const totalPages = Math.ceil(reversedData.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentData = reversedData.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
+  const currentData = reversedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   const ShowData = currentData.length;
 
   useEffect(() => {
     axios.get("http://localhost:5000/fetchapprove")
       .then((response) => {
+        console.log(response.data)
         setUserData(response.data);
       })
       .catch((error) => {
@@ -52,8 +46,7 @@ const History = () => {
       <table className="table-auto w-full text-sm">
         <thead className="bg-gray-100 shadow">
           <tr>
-            <th className="px-4 py-4 text-center text-xl font-bold">S.No</th>
-            <th className="px-4 py-4 text-center text-xl font-bold">
+            <th className="px-4 py-4 text-center text-xl font-bold">S.No</th>            <th className="px-4 py-4 text-center text-xl font-bold">
               Reference ID
             </th>
             <th className="px-4 py-4 text-center text-xl font-bold">
@@ -87,14 +80,14 @@ const History = () => {
           </tr>
         </thead>
         <tbody>
-          {currentData.map((item) => (
+          {currentData.map((item, index) => (
             <tr
-              key={item.id}
+              key={index}
               className="border-t cursor-pointer hover:bg-gray-100 text-center even:bg-[#d9d9d944]"
-              onClick={() => navigate(`/pending/${item.id}`)}
+              onClick={() => navigate(`/history/${item.id}`)}
 
             >
-              <td className="px-8 py-2 border-r">{item.id}</td>
+              <td className="px-8 py-2 border-r">{index}</td>
               <td className="px-4 py-2 border-r">{item.referenceid}</td>
               <td className="px-4 py-2 border-r">{item.name}</td>
               <td className="px-4 py-2 border-r">{item.mobile}</td>

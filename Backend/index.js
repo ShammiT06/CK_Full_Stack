@@ -102,8 +102,8 @@ app.get("/fetchData", (req, res) => {
 
 //pay appove
 
-app.get("/payment", (req, res) => {
-  const payment = "SELECT * from users where status = 'Approved'";
+app.get("/pay", (req, res) => {
+  const payment = "SELECT * FROM USERS WHERE STATUS = 'Approved'";
   con.query(payment, (err, result) => {
     if (err) {
       console.log("Error in Fecting Data")
@@ -429,58 +429,142 @@ app.get("/user_fill",(req,res)=>{
 
 
 //Razor Pay Details
+// Razorpay instance
 const razorpay = new Razorpay({
-  key_id:"rzp_live_gN9cIxPm0o55sE",
-  key_secret:"CLaH569cQ4Pb9PxHU6jHhPPA"
-})
+  key_id:process.env.RAZORPAY_KEY_ID,
+  key_secret:process.env.RAZORPAY_KEY_SECRET
+});
 
-
-app.post("/create_order",async(req,res)=>{
-  try{
-    const amount = req.body.amount
-    console.log(amount)
-    
-    const order = await razorpay.orders.create({
-      amount:amount*100,
-      currency:"INR",
-      receipt:"receipt#1",
-      payment_capture:1,
-    })
-    res.status(200).json({
-      id:order.id,
-    })
-  }catch(error)
-  {
-    console.log("Error")
+// For RazorpayX auth
+const razorpayAuth = {
+  auth: {
+    username: process.env.RAZORPAY_KEY_ID,
+    password: process.env.RAZORPAY_KEY_SECRET,
   }
+};
 
-})
-
-
-app.post("/verify-payment", async (req, res) => {
+// 1. Create Order
+app.post("/create_order", async (req, res) => {
   try {
-    const { paymentData } = req.body;
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = paymentData;
+    const amount = req.body.amount; // Amount in INR
+    const order = await razorpay.orders.create({
+      amount: amount * 100, // Amount in paise
+      currency: "INR",
+      receipt: "receipt#1",
+      payment_capture: 1,
+    });
+    res.status(200).json({ id: order.id });
+  } catch (error) {
+    console.error("Order Creation Error:", error);
+    res.status(500).json({ error: "Order creation failed" });
+  }
+});
 
-    
-    const crypto = require("crypto");
-    const hmac = crypto.createHmac("sha256", "your_key_secret");
+// 2. Verify Payment Signature
+app.post("/verify-payment", (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body.paymentData;
+    const hmac = crypto.createHmac("sha256", RAZORPAY_KEY_SECRET);
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
     const generated_signature = hmac.digest("hex");
 
     if (generated_signature === razorpay_signature) {
-      
       res.status(200).send("Payment Verified");
     } else {
       res.status(400).send("Payment Verification Failed");
     }
   } catch (error) {
-    console.error(error);
+    console.error("Verification Error:", error);
     res.status(500).send("Error verifying payment");
   }
 });
 
+// 3. Validate UPI ID
+app.post('/validate-vpa', async (req, res) => {
+  const { vpa } = req.body;
 
+  try {
+    const response = await axios.post(
+      'https://api.razorpay.com/v1/payments/validate/vpa',
+      { vpa },
+      razorpayAuth
+    );
+
+    if (!response.data.success) {
+      return res.status(400).json({ error: 'Invalid UPI ID' });
+    }
+
+    res.json({ success: true, vpa_validated: true });
+  } catch (err) {
+    console.error("VPA Validation Error:", err.response?.data || err);
+    res.status(500).json({ error: 'Failed to validate VPA' });
+  }
+});
+
+// 4. Add Customer Contact
+app.post('/add-customer', async (req, res) => {
+  const { name, email, contact } = req.body;
+
+  try {
+    const response = await axios.post(
+      'https://api.razorpay.com/v1/contacts',
+      { name, email, contact, type: 'customer' },
+      razorpayAuth
+    );
+    res.json({ contact_id: response.data.id });
+  } catch (err) {
+    console.error("Contact Creation Error:", err.response?.data || err);
+    res.status(500).json({ error: 'Failed to create contact' });
+  }
+});
+
+// 5. Add Fund Account
+app.post('/add-fund-account', async (req, res) => {
+  const { contact_id, vpa } = req.body;
+
+  try {
+    const response = await axios.post(
+      'https://api.razorpay.com/v1/fund_accounts',
+      {
+        contact_id,
+        account_type: 'vpa',
+        vpa: { address: vpa },
+      },
+      razorpayAuth
+    );
+    res.json({ fund_account_id: response.data.id });
+  } catch (err) {
+    console.error("Fund Account Error:", err.response?.data || err);
+    res.status(500).json({ error: 'Failed to create fund account' });
+  }
+});
+
+// 6. Payout to Fund Account
+app.post('/payout', async (req, res) => {
+  const { fund_account_id, amount, purpose } = req.body;
+
+  try {
+    const response = await axios.post(
+      'https://api.razorpay.com/v1/payouts',
+      {
+        account_number: RAZORPAYX_ACCOUNT_NO,
+        fund_account_id,
+        amount: amount * 100, // Amount in paise
+        currency: 'INR',
+        mode: 'UPI',
+        purpose: purpose || 'cashback',
+        queue_if_low_balance: true,
+      },
+      razorpayAuth
+    );
+
+    fs.appendFile('payout_logs.json', JSON.stringify(response.data) + ',\n', () => {});
+    res.json({ payout_id: response.data.id, status: response.data.status });
+  } catch (err) {
+    console.error("Payout Error:", err.response?.data || err);
+    res.status(500).json({ error: 'Failed to make payout' });
+  }
+});
 
 
 app.listen(5000, function () {

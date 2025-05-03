@@ -36,7 +36,8 @@ function Payment() {
     const [shop, setShop] = useState("");
     const [pincode, setPincode] = useState("");
     const [isRegistered,setIsregistered]=useState(false)
-    const [entry,setEntry]=useState("")
+    const [product,setProduct]=useState()
+    //create an input field for product
     
 
     useEffect(() => {
@@ -136,49 +137,61 @@ function Payment() {
         }
     }
 
-    // need to change
-    useEffect(()=>{
-        
-    axios.get(`http://localhost:5000/date?number=${mobile}`).then((res)=>{
-        setEntry(res.data)
-    })
-
-    },[])
+    
 
 
     const uploadData = () => {
-        const currentDate= Date.now()
-        console.log(currentDate)
-        const last_sub = new Date(entry)
-        console.log(last_sub)
+        axios.get(`http://localhost:5000/date?number=${mobile}`).then((res) => {
+            const registeredAt = res.data.registered_at
 
-        const diff= currentDate - last_sub
-        console.log(diff)
-        const seven = 7*24*60*60*1000
-
-        // if(diff>=seven)
-        // {
-            axios.post("http://localhost:5000/user", {user,mobile,upiId,image,spin,city,region,shop,pincode,lattitude,longitude}).then(() => {
-                console.log("Data Sent Successfully");
-            }).catch(() => {
-                console.log("Error in sending Data");
-            });
-    
-
-        // }
-        // else
-        // {
-        //     alert("You Allready Done for the Week Try after 7 days")
-        //     navigate("/")
-
-        // }
-
-
-     
-        setTimeout(() => {
-           
-            navigate("/ref");
-        }, 2000);
+            if (!registeredAt) {
+              axios.post("http://localhost:5000/user", {user,mobile,upiId,image,spin,city,region,shop,pincode,lattitude,longitude})
+                .then(() => {
+                  console.log("Data Sent Successfully (New User)");
+                })
+                .catch(() => {
+                  console.log("Error in sending Data");
+                });
+          
+              setTimeout(() => {
+                navigate("/ref");
+              }, 2000);
+          
+              return
+            }
+          
+        
+            const lastDate = new Date(registeredAt).getTime();
+            const currentDate = Date.now();
+          
+            console.log("Last Date:", lastDate);
+            console.log("Current Date:", currentDate);
+          
+            const diff = currentDate - lastDate;
+            const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+          
+          
+            if (diff > sevenDays) {
+              axios.post("http://localhost:5000/user", {user,mobile,upiId,image,spin,city,region,shop,pincode,lattitude,longitude})
+                .then(() => {
+                  console.log("Data Sent Successfully (Old User)");
+                })
+                .catch(() => {
+                  console.log("Error in sending Data");
+                });
+          
+              setTimeout(() => {
+                navigate("/ref");
+              }, 2000);
+            } else {
+              alert("You Already Done for the Week");
+              setTimeout(() => {
+                navigate("/");
+              }, 1000);
+            }
+          });
+          
+       
     };
 
     const requestOtp = () => {
