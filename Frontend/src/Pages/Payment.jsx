@@ -91,7 +91,6 @@ function Payment() {
                 setShop(data.data.shopname)
                 setPincode(data.data.pincode)
                 setUpiId(data.data.upiid)
-                setspin(data.data.referenceid)
                 console.log(data.data)
               } else{
                 setIsregistered(false)
@@ -161,15 +160,21 @@ function Payment() {
             }
           
         
-            const lastDate = new Date(registeredAt).getTime();
-            const currentDate = Date.now();
-          
-            console.log("Last Date:", lastDate);
-            console.log("Current Date:", currentDate);
-          
+            const lastDate = new Date(registeredAt)
+            const currentDate = new Date()           
+            console.log("Last Date:", lastDate)
+            console.log("Current Date:", currentDate)
+            
+            
             const diff = currentDate - lastDate;
-            const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
-          
+            const sevenDays = 7 * 24 * 60 * 60 * 1000;
+            
+            
+            lastDate.setDate(lastDate.getDate() + 7);
+            
+            
+            const futureDate = lastDate.toISOString().split('T')[0];
+            
           
             if (diff > sevenDays) {
               axios.post("http://localhost:5000/user", {user,mobile,upiId,image,spin,city,region,shop,pincode,lattitude,longitude})
@@ -184,7 +189,8 @@ function Payment() {
                 navigate("/ref");
               }, 2000);
             } else {
-              alert("You Already Done for the Week");
+              alert(`You Already done for the Week 
+                Please try again on ${futureDate}`);
               setTimeout(() => {
                 navigate("/");
               }, 1000);
