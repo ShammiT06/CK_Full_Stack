@@ -30,8 +30,8 @@ function Payment() {
     const { city } = useContext(CityContext);
     const { region } = useContext(RegionContext);
     const { mobile, setmobile } = useContext(MobileContext);
-    const { lattitude } = useContext(LattitudeContext);
-    const { longitude } = useContext(LongitudeContext);
+    const { lattitude, setLattitude } = useContext(LattitudeContext);
+    const { longitude,setLongitude } = useContext(LongitudeContext);
     const [imageText, setImageText] = useState("");
     const [shop, setShop] = useState("");
     const [pincode, setPincode] = useState("");
@@ -79,33 +79,82 @@ function Payment() {
         }
     }, [scannerVisible, scannerStarted]);
 
-    useEffect(() => {
-        if (mobile.length === 10) {
-          axios
-            .get(`http://localhost:5000/user_fill?mobilenumber=${mobile}`).then((data) => {
-              console.log("Data Fetched:", data.data);
-              if (data.data && data.data.name) {
-                setIsregistered(true)
-                setUser(data.data.name)
-                setmobile(data.data.mobile)
-                setShop(data.data.shopname)
-                setPincode(data.data.pincode)
-                setUpiId(data.data.upiid)
-                console.log(data.data)
-              } else{
-                setIsregistered(false)
-              }
-            })
-            .catch((err) => {
-              console.error("Error:", err)
-              setIsregistered(false)
-            });
+
+
+
+// Haversine formula to get distance in meters
+function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371000; // Radius of the earth in meters
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+    Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in meters
+}
+
+useEffect(() => {
+  if (mobile.length === 10) {
+    axios
+      .get(`http://localhost:5000/user_fill?mobilenumber=${mobile}`)
+      .then((data) => {
+       
+        if (data.data && data.data.name) {
+          const userLat = parseFloat(data.data.lattitude);
+          const userLng = parseFloat(data.data.longitude);
+          
+          // Get current location from browser
+          navigator.geolocation.getCurrentPosition((position) => {
+            const currentLat = position.coords.latitude;
+            const currentLng = position.coords.longitude;
+           
+
+            const distance = getDistanceFromLatLonInMeters(
+              userLat,
+              userLng,
+              currentLat,
+              currentLng
+            );
+
+            console.log("Distance in meters:", distance);
+
+            if (distance <= 50) {
+              setIsregistered(true);
+              setUser(data.data.name);
+              setmobile(data.data.mobile);
+              setShop(data.data.shopname);
+              setPincode(data.data.pincode);
+              setUpiId(data.data.upiid);
+              setLattitude(data.data.lattitude)
+              setLongitude(data.data.longitude)
+            } else {
+              setIsregistered(false);
+              console.log(data.data.lattitude)
+        console.log(data.data.longitude)
+              alert("You are not within 50 meters of your shop location.");
+            }
+          }, (error) => {
+            console.error("Location Error:", error);
+            alert("Unable to get current location.");
+            setIsregistered(false);
+          });
+
+        } else {
+          setIsregistered(false);
         }
-      }, [mobile]);
+      })
+      .catch((err) => {
+        console.error("Error:", err);
+        setIsregistered(false);
+      });
+  }
+}, [mobile]);
 
 
-      
-
+     
     const camera = () => {
         const cameraOutput = document.createElement("input");
         cameraOutput.type = "file";

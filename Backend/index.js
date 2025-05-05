@@ -24,8 +24,8 @@ const twilioNumber = "+19704142856"
 let link = "https://spinz-full-stack.vercel.app/tracking"
 
 const con = new Client({
-  host: "localhost",
-  user: "postgres",
+  host: "13.126.249.32",
+  user: "dbadmin",
   port: 5432,
   password: process.env.DATAPASS,
   database: process.env.DATABASE,
