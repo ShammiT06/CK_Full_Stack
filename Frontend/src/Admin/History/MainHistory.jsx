@@ -96,8 +96,7 @@ const History = () => {
               <td className="px-4 py-2 border-r">
                 <span className="flex items-center justify-start ml-5 gap-1">
                   <span
-                    className={`h-3 w-3 rounded-full ${item.status === "Approved" ? "bg-green-500" : "bg-red-500"
-                      }`}
+                    className={`h-3 w-3 rounded-full ${item.status === "Approved" ? "bg-green-500" : "bg-red-500"}`}
                   ></span>
                   {item.status}
                 </span>

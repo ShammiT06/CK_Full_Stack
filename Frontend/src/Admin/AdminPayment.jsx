@@ -5,40 +5,27 @@ import razor from "../assets/third_logo-107.png";
 import { auth } from "../config.js";
 import { useNavigate } from "react-router-dom";
 
-
 export default function AdminPayment() {
   const [userData, setUserData] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
-
-  
-  useEffect(()=>{
-    auth.onAuthStateChanged((user)=>{
-      if(user)
-      {
-        console.log("")
-      }
-      else
-      {
-       navigate("/login")
-      }
-  
-
-    })
-
-  },[])
-
-
-  // Fetch users from backend
   useEffect(() => {
-    axios.get("http://localhost:5000/pay")
+    auth.onAuthStateChanged((user) => {
+      if (!user) navigate("/login");
+    });
+  }, []);
+
+  // Fetch users
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/pay")
       .then((res) => setUserData(res.data))
       .catch((err) => console.error("Failed to fetch user data:", err));
   }, []);
 
-  // Handle checkbox toggle
+  // Toggle selection
   const handleCheckboxChange = (id) => {
     setSelectedUsers((prev) =>
       prev.includes(id)
@@ -47,7 +34,7 @@ export default function AdminPayment() {
     );
   };
 
-  // Handle payout for selected users
+  // Payout process
   const handlePayouts = async () => {
     const selectedUserDetails = userData.filter((user) =>
       selectedUsers.includes(user.id)
@@ -62,7 +49,7 @@ export default function AdminPayment() {
 
     for (const user of selectedUserDetails) {
       try {
-        // Step 1: Validate VPA
+        // 1. Validate VPA
         const validateRes = await axios.post("http://localhost:5000/validate-vpa", {
           vpa: user.upiid,
         });
@@ -72,7 +59,7 @@ export default function AdminPayment() {
           continue;
         }
 
-        // Step 2: Create Contact
+        // 2. Create Contact
         const contactRes = await axios.post("http://localhost:5000/add-customer", {
           name: user.name,
           email: `${user.name.toLowerCase().replace(" ", "")}@example.com`,
@@ -81,7 +68,7 @@ export default function AdminPayment() {
 
         const contact_id = contactRes.data.contact_id;
 
-        // Step 3: Create Fund Account
+        // 3. Create Fund Account
         const fundRes = await axios.post("http://localhost:5000/add-fund-account", {
           contact_id,
           vpa: user.upiid,
@@ -89,7 +76,7 @@ export default function AdminPayment() {
 
         const fund_account_id = fundRes.data.fund_account_id;
 
-        // Step 4: Make Payout
+        // 4. Payout
         const payoutRes = await axios.post("http://localhost:5000/payout", {
           fund_account_id,
           amount: 1,
@@ -97,7 +84,11 @@ export default function AdminPayment() {
         });
 
         alert(`✅ Payout successful for ${user.name} (ID: ${payoutRes.data.payout_id})`);
-        axios.put("")
+
+        // ✅ Update backend with selected name
+         axios.put("http://localhost:5000/update", {
+          id: user.id, // you can also use upiid: user.upiid
+        });
 
       } catch (err) {
         console.error("Error during payout:", err);
@@ -112,7 +103,6 @@ export default function AdminPayment() {
     <>
       <Header />
       <div className="p-6 md:p-10 flex flex-col md:flex-row gap-6">
-        {/* User Table */}
         <div className="w-full md:w-2/3 overflow-auto">
           <h2 className="text-2xl font-semibold mb-4">Review & Confirmation</h2>
           <table className="w-full border rounded-lg overflow-hidden">
@@ -169,11 +159,9 @@ export default function AdminPayment() {
 
           <div>
             <h3 className="text-lg font-semibold mb-2">Pay using</h3>
-            <div className="space-y-2">
-              <label className="flex items-center gap-10">
-                <img src={razor} alt="Razorpay" className="w-[136px] h-[35px]" />
-              </label>
-            </div>
+            <label className="flex items-center gap-10">
+              <img src={razor} alt="Razorpay" className="w-[136px] h-[35px]" />
+            </label>
           </div>
 
           <div className="flex flex-col gap-4 mt-4">
@@ -181,7 +169,9 @@ export default function AdminPayment() {
               onClick={handlePayouts}
               disabled={loading}
               className={`flex-1 py-2 rounded-full font-semibold font-inter ${
-                loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
               {loading ? "Processing..." : "Send RazorpayX Payout"}

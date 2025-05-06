@@ -20,7 +20,7 @@ const accoundSid = process.env.ACCOUNTSID
 const authToken = process.env.AUTHTOKEN
 const client = new twilio(accoundSid, authToken)
 
-const twilioNumber = "+18562155875"
+const twilioNumber = "+19704108634"
 
 let link = "https://spinz-full-stack.vercel.app/tracking"
 
@@ -104,7 +104,8 @@ app.get("/fetchData", (req, res) => {
 //pay appove
 
 app.get("/pay", (req, res) => {
-  const payment = "SELECT * FROM USERS WHERE STATUS = 'Approved'";
+  const payment = `SELECT * FROM users WHERE status = 'Approved'`;
+
   con.query(payment, (err, result) => {
     if (err) {
       console.log("Error in Fecting Data")
@@ -231,7 +232,7 @@ app.post("/con", async (req, res) => {
   try {
     const message = await client.messages.create({
       body: `Your Request has been Submitted to Spinz.co Admin. This is Your Reference id ${refid}. For any further quereis or status tracking click the link given below ${link} `,
-      from: "+18562155875",
+      from: "+19704108634",
       to: `+91${phone}`
     })
     res.send("Confirmation Message Sent Successfully")
@@ -295,7 +296,7 @@ app.post("/otp", async (req, res) => {
   try {
     const message = await client.messages.create({
       body: `Your OTP is ${otp}`,
-      from: "+18562155875",
+      from: "+19704108634",
       to: `+91${phone}`
     });
 
@@ -584,10 +585,22 @@ app.put("/decline", (req, res) => {
 });
 
 
-app.put("/update",(req,res)=>{
-  updated_table=` UPDATE "users" SET status ='Paid' WHERE users_id=$1`;
-  con.query(updated_table,[])
-})
+app.put("/update", (req, res) => {
+  const { id } = req.body;
+  console.log("Updating ID:", id);
+
+  const updated_table = `UPDATE "users" SET status = 'Paid' WHERE id = $1`;
+  con.query(updated_table, [id], (err, result) => {
+    if (err) {
+      console.log("There is an error", err);
+      res.status(500).send("Failed to update");
+    } else {
+      console.log("✅ Updated the table");
+      res.send("Update successful");
+    }
+  });
+});
+
 
 app.use(express.static(path.join(__dirname, "../frontend/build")));
 app.get("/", (req, res) => {
