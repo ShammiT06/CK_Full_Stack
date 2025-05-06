@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import axios from 'axios';
 
@@ -11,11 +10,20 @@ const OCR = () => {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoRef.current.srcObject = stream;
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' }, // Prefer back camera on mobile
+        },
+        audio: false,
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
       setStreaming(true);
+      setError('');
     } catch (err) {
-      setError('Unable to access camera', err.message);
+      console.error('Camera Access Error:', err);
+      setError('Unable to access camera: ' + err.message);
     }
   };
 
@@ -49,7 +57,8 @@ const OCR = () => {
           setOcrText('');
         }
       } catch (err) {
-        setError('OCR failed or server error', err.message);
+        console.error('OCR Server Error:', err);
+        setError('OCR failed or server error: ' + err.message);
         setOcrText('');
       }
     }, 'image/jpeg');
@@ -62,7 +71,7 @@ const OCR = () => {
         <button onClick={startCamera}>Start Camera</button>
       ) : (
         <>
-          <video ref={videoRef} autoPlay playsInline width="300" />
+          <video ref={videoRef} autoPlay playsInline width="100%" style={{ maxWidth: '400px' }} />
           <br />
           <button onClick={captureAndSend}>Capture & OCR</button>
         </>
