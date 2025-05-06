@@ -1,5 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
-import logo from "../assets/SpinzWhite.png"
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from '../Components/AdminHeader';
 import { Link } from 'react-router-dom';
@@ -13,7 +12,7 @@ const Dashboard = () => {
     const [approved,setapproved]=useState([])
 
     useEffect(() => {
-        axios.get("http://localhost:5000/bord").then((data) => {
+        axios.get("http://localhos:5000/bord").then((data) => {
             setdashboard(data.data)
         }).catch(() => {
             console.log("Error")
@@ -48,16 +47,6 @@ const Dashboard = () => {
 
 
     return (<>
-    {/* <div className='relative'> 
-        <div className='p-4 bg-pink-500 flex items-center justify-between'>
-        <div>
-        <img src={logo} alt="" />
-        </div>
-        <div className='flex gap-[40px]'>
-            <button className='p-3 border rounded'><Link to="/admin">Admin</Link></button>
-        </div>
-        </div>
-    </div> */}
     <Header/>
     
         <div className="p-6 bg-gray-100 min-h-screen">

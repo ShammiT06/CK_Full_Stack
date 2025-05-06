@@ -47,7 +47,7 @@ const InnerPending = () => {
 
   const handleApprove = async () => {
     try {
-      const res = await axios.put("http://localhost:5000/approveRequest", { id });
+      const res = await axios.put("http://localhost:5000/approveRequest", { id, remarks });
       console.log(res.data);
       setStatus("Approved");
     } catch (err) {
@@ -57,7 +57,7 @@ const InnerPending = () => {
 
   const handledecline = () => {
     try {
-      const res = axios.put("http://localhost:5000/decline", { id });
+      const res = axios.put("http://localhost:5000/decline", { id, remarks });
       console.log(res.data);
       setStatus("Declined");
     } catch (error) {
@@ -213,9 +213,10 @@ const InnerPending = () => {
                   </label>
                   <textarea
                     rows="3"
-                    value={vendor.remarks}
+                    value={remarks}
+                    onChange={((e)=>{setRemarks(e.target.value)})}
                     className="w-full p-3 border rounded-xl"
-                    readOnly
+                    // readOnly
                   ></textarea>
                 </div>
                 <div className="w-full">

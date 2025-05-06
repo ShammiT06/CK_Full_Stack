@@ -31,7 +31,7 @@ const Tabs = () => {
 
   const [activeTab, setActiveTab] = useState("pending");
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
+  // const [searchTerm, setSearchTerm] = useState("");
   const [admin, setAdmin] = useState(false)
 
 
@@ -105,7 +105,7 @@ const Tabs = () => {
               <img src={head} alt="" />
             </div>
           </div>
-          <input
+          {/* <input
             type="text"
             placeholder="Search by Name, Ref ID, Mobile, UPI Id..."
             className="border p-2 rounded w-full xl:w-full md:w-full"
@@ -114,7 +114,7 @@ const Tabs = () => {
               setSearchTerm(e.target.value);
               // setCurrentPage(1); // Reset to page 1 on search
             }}
-          />
+          /> */}
         </div>
       </div>
  : <div className="flex  items-center justify-between p-8 space-y-4">

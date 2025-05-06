@@ -18,6 +18,7 @@ import SupportRef from "../src/SMS/SupportRef.jsx";
 import Dashboard from "./Admin/Dashboard.jsx";
 import Pending from "./Admin/Pending/MainPending.jsx";
 import InnerHistory from "./Admin/History/InnerHistory.jsx";
+import Submission from "./Pages/Submission.jsx";
 
 
 
@@ -38,7 +39,7 @@ function App() {
   const [mobile, setmobile] = useState("")
   const [lattitude, setLattitude] = useState()
   const [longitude,setLongitude]=useState()
-  const [text,setText]=useState()
+  const [text,setText]=useState("")
 
   return (
     <>
@@ -57,15 +58,16 @@ function App() {
                       <Route path="/" element={<Terms />} />
                       <Route path="/cam" element={<Camera />} />
                       <Route path="/loc" element={<Location />} />
-                      <Route path="/form" element={<User />} />
                       <Route path="/pay" element={<Payment />} />
                       <Route path="/ref" element={<Reference />} />
+                      <Route path="/info" element={<Submission/>}></Route>
                       {/* Admin Page Routes */}
                       <Route path="/login" element={<AdminLoginPage />} />
                       <Route path="/admin" element={<Tabs />} />
                       <Route path="/pending/:id" element={<InnerPending />} />
                       <Route path="/payout" element={<AdminPayment />} />
                       <Route path="/dash" element={<Dashboard />}></Route>
+                      <Route path="/ocr" element={<OCR/>} />
                       <Route path="/pend" element={<Pending />}>~</Route>
                       <Route path="/history/:id" element={<InnerHistory/>}></Route>
                       {/* SMS Routes */}

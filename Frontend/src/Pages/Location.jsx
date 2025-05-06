@@ -7,7 +7,8 @@ import {
     ImageContext,
     LattitudeContext,
     LongitudeContext,
-    RegionContext
+    RegionContext,
+    TextContext
 } from "../App";
 import Tesseract from "tesseract.js";
 
@@ -18,6 +19,7 @@ function Location() {
     const { setregion } = useContext(RegionContext);
     const { setLattitude } = useContext(LattitudeContext);
     const { setLongitude } = useContext(LongitudeContext);
+    const {setText}=useContext(TextContext)
 
     const [loading, setLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("");
@@ -44,14 +46,15 @@ function Location() {
                             const data = await res.json();
 
                             const cityName =
-                                data.address.city ||
-                                data.address.town ||
-                                data.address.village ||
-                                data.address.locality ||
-                                "Unknown City";
+                            data.address.city ||
+                            data.address.town ||
+                            data.address.village ||
+                            data.address.locality ||
+                            "Unknown City";
                             const state = data.address.state || "Unknown State";
 
                             setcity(cityName);
+                            console.log(cityName)
                             setregion(state);
                             setLattitude(latitude);
                             setLongitude(longitude);
@@ -102,6 +105,7 @@ function Location() {
 
             const lines = fullText.split("\n").map(line => line.trim());
             const filtered = lines.filter(line => /SBB\s?\d{5}/i.test(line));
+            setText(filtered)
 
             if (filtered.length > 0) {
                 console.log("✅ Matched Text:");

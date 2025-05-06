@@ -1,12 +1,9 @@
 
-
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-// import image from "/src/assets/demoimage.png";
 import Header from "/src/Components/AdminHeader.jsx";
 
 const InnerHistory = () => {
@@ -65,6 +62,8 @@ const InnerHistory = () => {
               <p><strong>State:</strong> {vendor.region}</p>
               <p><strong>Mobile number:</strong> {vendor.mobile}</p>
               <p><strong>UPI ID:</strong> {vendor.upiid}</p>
+              <p><strong>Remarks:</strong> {vendor.remarks}</p>
+              
             </div>
             {/* ))} */}
           </div>

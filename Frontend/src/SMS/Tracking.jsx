@@ -52,7 +52,7 @@ function Tracking() {
         setError("Unknown status received.");
       }
     } catch (err) {
-      setError("No record found for this Reference ID.");
+      setError("No record found for this Reference ID.", err.message);
     }
   };
 

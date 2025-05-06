@@ -112,7 +112,7 @@ const History = () => {
               </td>
               <td className="px-4 py-2 border-r">{item.pincode}</td>
               <td className="px-4 py-2 border-r">{item.lattitude}</td>
-              <td className="px-4 py-2 border-r">{item.logitude}</td>
+              <td className="px-4 py-2 border-r">{item.longitude}</td>
             </tr>
           ))}
         </tbody>

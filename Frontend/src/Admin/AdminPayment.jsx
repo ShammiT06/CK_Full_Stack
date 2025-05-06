@@ -97,6 +97,7 @@ export default function AdminPayment() {
         });
 
         alert(`✅ Payout successful for ${user.name} (ID: ${payoutRes.data.payout_id})`);
+        axios.put("")
 
       } catch (err) {
         console.error("Error during payout:", err);

@@ -4,9 +4,10 @@ import tick from "../assets/Vector.png";
 import scanner from "../assets/scanner.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Html5Qrcode } from "html5-qrcode";
-import { CityContext, ImageContext, LattitudeContext, LongitudeContext, MobileContext, Refcontext, RegionContext } from "../App";
+import { CityContext, ImageContext, LattitudeContext, LongitudeContext, MobileContext, Refcontext, RegionContext, TextContext } from "../App";
 import axios from 'axios';
 import { Phone } from "lucide-react";
+import Submission from "./Submission";
 
 function Payment() {
     const [otp, setOtp] = useState("");
@@ -32,11 +33,12 @@ function Payment() {
     const { mobile, setmobile } = useContext(MobileContext);
     const { lattitude, setLattitude } = useContext(LattitudeContext);
     const { longitude,setLongitude } = useContext(LongitudeContext);
-    const [imageText, setImageText] = useState("");
+    // const [imageText, setImageText] = useState("");
     const [shop, setShop] = useState("");
     const [pincode, setPincode] = useState("");
+    const {text}=useContext(TextContext)
     const [isRegistered,setIsregistered]=useState(false)
-    const [product,setProduct]=useState()
+    // const [product,setProduct]=useState()
     //create an input field for product
     
 
@@ -132,9 +134,10 @@ useEffect(() => {
               setLongitude(data.data.longitude)
             } else {
               setIsregistered(false);
-              console.log(data.data.lattitude)
-        console.log(data.data.longitude)
+        //       console.log(data.data.lattitude)
+        // console.log(data.data.longitude)
               alert("You are not within 50 meters of your shop location.");
+              navigate("/")
             }
           }, (error) => {
             console.error("Location Error:", error);
@@ -168,7 +171,7 @@ useEffect(() => {
     };
 
     const verifyOtp = () => {
-        if (otp === finalOtp) {
+        if (otp == finalOtp) {
             setHide(false);
             setVerify(
                 <div className="flex items-center gap-2">
@@ -250,7 +253,7 @@ useEffect(() => {
     };
 
     const requestOtp = () => {
-        axios.post("https://localhost:5000/otp", { mobile }).then((data) => {
+        axios.post("http://localhost:5000/otp", { mobile }).then((data) => {
             const newOtp = data.data.otp;
             setFinalOtp(newOtp);
         });
@@ -272,7 +275,7 @@ useEffect(() => {
                     type="text"
                     placeholder="Enter Your Code"
                     className="mt-5 border border-black p-2 rounded-md w-80"
-                    value={imageText}
+                    value={text}
                     onChange={(e) => setImageText(e.target.value)}
                 />
             </div>

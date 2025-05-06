@@ -20,7 +20,7 @@ const accoundSid = process.env.ACCOUNTSID
 const authToken = process.env.AUTHTOKEN
 const client = new twilio(accoundSid, authToken)
 
-const twilioNumber = "+19704142856"
+const twilioNumber = "+18562155875"
 
 let link = "https://spinz-full-stack.vercel.app/tracking"
 
@@ -174,61 +174,39 @@ app.get("/pending", (req, res) => {
 
 //Approve Api
 app.put("/approveRequest", (req, res) => {
-  const id = req.body.id;
- 
+  const { id, remarks } = req.body;
 
-  const query = `
+  const updateUserStatus = `
     UPDATE "users"
-    SET status = 'Approved'
+    SET status = 'Approved', remarks = $2
     WHERE id = $1
   `;
 
-  const update_track = `UPDATE "tracking" SET status ='Approved', updated_at= CURRENT_TIMESTAMP
-  WHERE users_id =$1` 
+  const updateTracking = `
+    UPDATE "tracking"
+    SET status = 'Approved', updated_at = CURRENT_TIMESTAMP
+    WHERE users_id = $1
+  `;
 
-  con.query(query, [id], (err, result) => {
+  // First: update user status and remarks
+  con.query(updateUserStatus, [id, remarks], (err, result) => {
     if (err) {
-      console.error("SQL Error:", err);
-      return res.status(500).json({ error: "Update failed" });
+      console.error("Error updating users table:", err);
+      return res.status(500).json({ error: "Failed to update user status" });
     }
-  });
 
-  con.query(update_track,[id],(err,results)=>{
-    if(err)
-    {
-      console.log("Error in Approving")
-    }
-    res.json({message:"User and Tracking Table Updated "})
-  })
+    // Then: update tracking table
+    con.query(updateTracking, [id], (err, result) => {
+      if (err) {
+        console.error("Error updating tracking table:", err);
+        return res.status(500).json({ error: "Failed to update tracking info" });
+      }
+
+      // All done
+      res.json({ message: "User and Tracking Table Updated Successfully" });
+    });
+  });
 });
-
-// Decline Api
-app.put("/decline", (req, res) => {
-  const id = req.body.id;
-  console.log(id)
-
-  const query = `
-  UPDATE "users"
-  SET status ='Declined'
-  WHERE id=$1`;
-
-  const decline_query = ` UPDATE "tracking" SET status='Declined' WHERE users_id=$1`
-
-  con.query(query, [id], (err, result) => {
-    if (err) {
-      console.error("SQL Error:", err);
-      return res.status(500).json({ error: "Update failed" });
-    }
-  });
-
-  con.query(decline_query,[id],(err,result)=>{
-    if(err)
-    {
-      console.log("Error in Sending")
-    }
-    console.log("Set to Declined")
-  })
-})
 
 //Approved Request
 
@@ -253,7 +231,7 @@ app.post("/con", async (req, res) => {
   try {
     const message = await client.messages.create({
       body: `Your Request has been Submitted to Spinz.co Admin. This is Your Reference id ${refid}. For any further quereis or status tracking click the link given below ${link} `,
-      from: "+19404778897",
+      from: "+18562155875",
       to: `+91${phone}`
     })
     res.send("Confirmation Message Sent Successfully")
@@ -317,7 +295,7 @@ app.post("/otp", async (req, res) => {
   try {
     const message = await client.messages.create({
       body: `Your OTP is ${otp}`,
-      from: "+19704142856",
+      from: "+18562155875",
       to: `+91${phone}`
     });
 
@@ -548,15 +526,17 @@ app.post('/payout', async (req, res) => {
     const response = await axios.post(
       'https://api.razorpay.com/v1/payouts',
       {
-        account_number: RAZORPAYX_ACCOUNT_NO,
+        account_number:process.env.RAZORPAY_ACCOUNT_NO,
         fund_account_id,
         amount: amount * 100, // Amount in paise
         currency: 'INR',
         mode: 'UPI',
         purpose: purpose || 'cashback',
         queue_if_low_balance: true,
+        
       },
       razorpayAuth
+     
     );
 
     fs.appendFile('payout_logs.json', JSON.stringify(response.data) + ',\n', () => {});
@@ -564,7 +544,54 @@ app.post('/payout', async (req, res) => {
   } catch (err) {
     console.error("Payout Error:", err.response?.data || err);
     res.status(500).json({ error: 'Failed to make payout' });
+    console.error("Payout Error:", err.response?.data || err.message);
+
   }
+
+});
+
+// Decline Api
+app.put("/decline", (req, res) => {
+  const { id, remarks } = req.body;
+
+  const query = `
+    UPDATE "users"
+    SET status = 'Declined', remarks = $2
+    WHERE id = $1
+  `;
+
+  const decline_query = `
+    UPDATE "tracking"
+    SET status = 'Declined'
+    WHERE users_id = $1
+  `;
+
+  con.query(query, [id, remarks], (err, result) => {
+    if (err) {
+      console.error("SQL Error:", err);
+      return res.status(500).json({ error: "User update failed" });
+    }
+
+    con.query(decline_query, [id], (err, result) => {
+      if (err) {
+        console.error("Tracking update error:", err);
+        return res.status(500).json({ error: "Tracking update failed" });
+      }
+
+      res.json({ message: "User and Tracking status set to Declined" });
+    });
+  });
+});
+
+
+app.put("/update",(req,res)=>{
+  updated_table=` UPDATE "users" SET status ='Paid' WHERE users_id=$1`;
+  con.query(updated_table,[])
+})
+
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });
 
 

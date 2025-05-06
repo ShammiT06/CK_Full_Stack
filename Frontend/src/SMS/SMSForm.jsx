@@ -62,7 +62,7 @@ function SMSForm() {
       axios
         .post("http://localhost:5000/mail", { username, mobile, email, description, media })
         .then((response) => {
-          console.log("Datasent Successfully")
+          console.log("Datasent Successfully", response.message)
 
         })
         .catch((error) => {
