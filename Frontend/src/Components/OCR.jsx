@@ -9,20 +9,27 @@ const OCR = () => {
   const [streaming, setStreaming] = useState(false);
 
   const startCamera = async () => {
+    setError('');
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const constraints = {
         video: {
-          facingMode: { ideal: 'environment' }, // Prefer back camera on mobile
+          facingMode: { ideal: 'environment' }, // Prefer back camera
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         },
-        audio: false,
-      });
+        audio: false
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play();
+        };
       }
       setStreaming(true);
-      setError('');
     } catch (err) {
-      console.error('Camera Access Error:', err);
+      console.error('Camera start error:', err);
       setError('Unable to access camera: ' + err.message);
     }
   };
@@ -33,10 +40,10 @@ const OCR = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     canvas.toBlob(async (blob) => {
       const formData = new FormData();
@@ -44,20 +51,17 @@ const OCR = () => {
 
       try {
         const response = await axios.post('https://spinzreward.site/ocr/ocr', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
 
         if (response.data.text) {
           setOcrText(response.data.text);
-          setError('');
-        } else if (response.data.error) {
-          setError(response.data.error);
+        } else {
           setOcrText('');
+          setError(response.data.error || 'No text detected');
         }
       } catch (err) {
-        console.error('OCR Server Error:', err);
+        console.error('OCR API error:', err);
         setError('OCR failed or server error: ' + err.message);
         setOcrText('');
       }
@@ -66,16 +70,24 @@ const OCR = () => {
 
   return (
     <div style={{ fontFamily: 'Arial', padding: '20px' }}>
-      <h2>Camera OCR Scanner</h2>
+      <h2>Mobile Camera OCR</h2>
+
       {!streaming ? (
         <button onClick={startCamera}>Start Camera</button>
       ) : (
         <>
-          <video ref={videoRef} autoPlay playsInline width="100%" style={{ maxWidth: '400px' }} />
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            style={{ width: '100%', maxWidth: '400px', borderRadius: '8px' }}
+          />
           <br />
           <button onClick={captureAndSend}>Capture & OCR</button>
         </>
       )}
+
       <canvas ref={canvasRef} style={{ display: 'none' }} />
 
       {ocrText && (
@@ -84,8 +96,9 @@ const OCR = () => {
           <pre>{ocrText}</pre>
         </div>
       )}
+
       {error && (
-        <div style={{ color: 'red' }}>
+        <div style={{ color: 'red', marginTop: '10px' }}>
           <strong>Error:</strong> {error}
         </div>
       )}
