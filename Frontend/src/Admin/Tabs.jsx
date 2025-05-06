@@ -39,7 +39,7 @@ const Tabs = () => {
     auth.onAuthStateChanged((user)=>{
       if(user)
       {
-        if(user.uid ==="TNXS2KB763O2WwxaDhJYeCf0gqu1")
+        if(user.uid ==="0bnEhkgmOEQmO5zrZhNXFZsk19C3")
         {
         setAdmin(true)
 

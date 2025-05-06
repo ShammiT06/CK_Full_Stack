@@ -26,7 +26,7 @@ const InnerPending = () => {
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
-      if (user && user.uid === "TNXS2KB763O2WwxaDhJYeCf0gqu1") {
+      if (user && user.uid === "0bnEhkgmOEQmO5zrZhNXFZsk19C3") {
         setAdmin(true);
       } else {
         console.log("He is not a super admin");

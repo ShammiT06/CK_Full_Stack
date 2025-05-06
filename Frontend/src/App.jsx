@@ -28,6 +28,7 @@ const RegionContext = createContext()
 const MobileContext = createContext()
 const LattitudeContext = createContext()
 const LongitudeContext=createContext()
+const TextContext= createContext()
 
 function App() {
   const [image, setimage] = useState("");
@@ -37,6 +38,7 @@ function App() {
   const [mobile, setmobile] = useState("")
   const [lattitude, setLattitude] = useState()
   const [longitude,setLongitude]=useState()
+  const [text,setText]=useState()
 
   return (
     <>
@@ -47,6 +49,7 @@ function App() {
               <MobileContext.Provider value={{ mobile, setmobile }}>
                 <LattitudeContext.Provider value={{ lattitude, setLattitude }}>
                   <LongitudeContext.Provider value={{longitude,setLongitude}}>
+                    <TextContext.Provider value={{text,setText}}>
 
                   <BrowserRouter>
                     <Routes>
@@ -71,6 +74,7 @@ function App() {
                       <Route path="/supportRef" element={<SupportRef />} />
                     </Routes>
                   </BrowserRouter>
+                  </TextContext.Provider>
                   </LongitudeContext.Provider>
                 </LattitudeContext.Provider>
               </MobileContext.Provider>
@@ -90,3 +94,4 @@ export { RegionContext }
 export { MobileContext }
 export {LattitudeContext}
 export {LongitudeContext}
+export {TextContext}
