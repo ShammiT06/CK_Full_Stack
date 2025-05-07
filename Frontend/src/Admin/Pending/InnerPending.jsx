@@ -11,6 +11,7 @@ const InnerPending = () => {
   const [userData, setUserData] = useState([]);
   const [remarks, setRemarks] = useState("");
   const [admin, setAdmin] = useState(false);
+  const [product,setProduct]=useState(0)
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -47,24 +48,44 @@ const InnerPending = () => {
 
   const handleApprove = async () => {
     try {
-      const res = await axios.put("http://localhost:5000/approveRequest", { id, remarks });
-      console.log(res.data);
+      const res = await axios.put("http://localhost:5000/approveRequest", { id });
+      console.log("Approved:", res.data);
       setStatus("Approved");
+  
+      // Set product to 2 after approval
+      await changeproduct(2);
     } catch (err) {
       console.error("Approval failed:", err.response?.data || err.message);
     }
   };
-
-  const handledecline = () => {
+  
+  const handledecline = async () => {
     try {
-      const res = axios.put("http://localhost:5000/decline", { id, remarks });
-      console.log(res.data);
+      const res = await axios.put("http://localhost:5000/decline", { id });
+      console.log("Declined:", res.data);
       setStatus("Declined");
+  
+      // Optionally set product to 0 on decline
+      await changeproduct(0);
     } catch (error) {
       console.error("Decline failed:", error.response?.data || error.message);
     }
   };
-
+  
+  // Accept product as parameter
+  const changeproduct = async (newProduct) => {
+    try {
+      const res = await axios.put("http://localhost:5000/update_product", {
+        id,
+        product: newProduct
+      });
+      console.log("Product updated:", res.data);
+      setProduct(newProduct);
+    } catch (error) {
+      console.error("Product update failed:", error.response?.data || error.message);
+    }
+  };
+  
   if (!vendor) return <div className="p-4 text-red-500">Vendor not found</div>;
 
   return (
@@ -180,8 +201,7 @@ const InnerPending = () => {
                       readOnly
                     />
                   </div>
-
-                </div>
+                  </div>
               </div>
 
               <div className="flex flex-col mt-20 w-full space-y-4 items-center">
@@ -219,6 +239,17 @@ const InnerPending = () => {
                     // readOnly
                   ></textarea>
                 </div>
+                <div className="w-full">
+                  <label className="block text-md font-medium mb-1">
+                    No of Products
+                  </label>
+                  <input type="text"
+                    value={product}
+                    onChange={((e)=>{setProduct(e.target.value)})}
+                    className="w-full p-3 border rounded-xl"
+                  ></input>
+                </div>
+               
                 <div className="w-full">
                   <h3 className="text-sm font-medium mb-2">Image Preview</h3>
                   <img

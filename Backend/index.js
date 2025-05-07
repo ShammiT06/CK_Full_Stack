@@ -5,6 +5,9 @@ const app = express()
 const twilio = require('twilio')
 app.use(express.json())
 app.use(cors())
+
+
+
 const XLSX = require("xlsx");
 const fs = require("fs");
 const path = require("path");
@@ -13,6 +16,7 @@ const axios = require("axios");
 const crypto=require('crypto')
 require('dotenv').config()
 const nodemailer = require("nodemailer")
+const router=express.Router()
 
 
 
@@ -20,7 +24,7 @@ const accoundSid = process.env.ACCOUNTSID
 const authToken = process.env.AUTHTOKEN
 const client = new twilio(accoundSid, authToken)
 
-const twilioNumber = "+19704108634"
+const twilioNumber = " +19704108634"
 
 let link = "https://spinz-full-stack.vercel.app/tracking"
 
@@ -602,6 +606,22 @@ app.put("/update", (req, res) => {
 });
 
 
+app.put("/update_product", (req, res) => {
+  const { id, product } = req.body;
+  console.log("Updating ID:", id, product);
+
+  const updated_table = `UPDATE users SET products = $1 WHERE id = $2`;
+  con.query(updated_table, [product, id], (err, result) => {
+    if (err) {
+      console.log("There is an error", err);
+      res.status(500).send("Failed to update");
+    } else {
+      console.log("✅ Updated the table");
+      res.send("Update successful");
+    }
+  });
+});
+
 app.use(express.static(path.join(__dirname, "../frontend/build")));
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
@@ -611,3 +631,5 @@ app.get("/", (req, res) => {
 app.listen(5000, function () {
   console.log("Server Started....")
 })
+
+module.exports = router;
